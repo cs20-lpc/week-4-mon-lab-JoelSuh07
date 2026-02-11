@@ -92,6 +92,51 @@ bool LinkedList<T>::isEmpty() const {
 template <typename T>
 void LinkedList<T>::remove(int position) {
     // TODO
+    if (head == nullptr) throw string ("remove: error, list does not exist"); // checks if list exists
+
+    if (position < 0 || position >= this -> length) throw string("remove: error, position out of bounds"); // checks for out of bounds
+
+    Node* curr = head;
+    Node* temp;
+    int count = 0;
+
+    
+
+    while (curr != nullptr){
+        
+        
+
+        if (count == position){
+            
+            if (curr -> prev == nullptr){ // first node
+
+               temp = head; 
+               head = head -> next;
+               delete temp;
+               --this->length;
+               return;
+
+            } else if (curr -> next == nullptr){ // last node
+
+                delete curr;
+                --this->length;
+                return;
+
+            } else if (!(curr -> prev == nullptr && curr -> next == nullptr)){ //removes middle node
+
+            temp = curr;
+            curr -> prev -> next = curr -> next;
+            curr = curr -> next;
+            --this->length;
+            delete temp;
+            return;
+
+        }
+        
+        curr = curr -> next;
+        ++count;
+    }
+}
 }
 
 template <typename T>
