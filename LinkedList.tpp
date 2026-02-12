@@ -3,7 +3,9 @@ LinkedList<T>::LinkedList()
 : head(nullptr) { }
 
 template <typename T>
-LinkedList<T>::LinkedList(const LinkedList<T>& copyObj) {
+LinkedList<T>::LinkedList(const LinkedList<T>& copyObj) 
+: head(nullptr) // initialized head 
+{
     copy(copyObj);
 }
 
@@ -23,7 +25,7 @@ LinkedList<T>::~LinkedList() {
 
 template <typename T>
 void LinkedList<T>::append(const T& elem) {
-    Node* n = new Node(elem);
+    Node* n = new Node(elem, nullptr, nullptr);
 
     if (head == nullptr) {
         head = n;
@@ -36,6 +38,7 @@ void LinkedList<T>::append(const T& elem) {
         }
 
         curr->next = n;
+        n -> prev = curr;
     }
 
     this->length++;
@@ -57,22 +60,30 @@ void LinkedList<T>::clear() {
 template <typename T>
 void LinkedList<T>::copy(const LinkedList<T>& copyObj) {
     // TODO
+    if (this == &copyObj){ //checks if self assignment 
+        return;
+    }
 
-    if (copyObj.head == nullptr){ //checks if other list is empty or not 
-        throw string("copy: error, other list is empty");
+    this->clear(); //clears the list incase there was existing data
+
+    //if copyObj is empty, return
+    if (copyObj.head == nullptr){
+        head = nullptr;
+        this->length = 0;
+        return;
     }
 
     //copy first node and put it into newHead
-    Node* newHead = new Node(copyObj.head->value);
-    newHead -> next = nullptr;
-    newHead -> prev = nullptr;
-    ++this->length;
+    head = new Node(copyObj.head->value);
+    head -> next = nullptr;
+    head -> prev = nullptr;
+    this->length = 1; // set to 1 incase list was not empty
 
     //create a curr pointer to traverse the other list(starting from 2nd node)
     Node* otherCurr = copyObj.head -> next;
 
     //create a curr pointer to traverse new list
-    Node* newCurr = newHead;
+    Node* curr = head;
 
     //copy rest of list
     while (otherCurr != nullptr){
@@ -82,12 +93,12 @@ void LinkedList<T>::copy(const LinkedList<T>& copyObj) {
 
         //links newNode to curr list
         newNode -> next = nullptr;
-        newNode -> prev = newCurr;
-        newCurr -> next = newNode;
+        newNode -> prev = curr;
+        curr -> next = newNode;
 
         //move both pointer forward(otherCurr is one node ahead of newCurr)
         otherCurr = otherCurr -> next;
-        newCurr = newCurr -> next; // or alternatively, newCurr = newNode
+        curr = newNode; //setting newNode to curr
 
         ++this->length;
     }
@@ -100,7 +111,7 @@ T LinkedList<T>::getElement(int position) const {
         throw string("getElement: error, position out of bounds");
     }
     
-    Node* curr = head;
+    const Node* curr = head;
 
     for (int i = 0; i < position; i++) {
         curr = curr->next;
@@ -117,7 +128,7 @@ int LinkedList<T>::getLength() const {
 template <typename T>
 void LinkedList<T>::insert(int position, const T& elem) {
     // TODO
-    if (position < 0 || position >= this -> length) throw string("insert: error, position out of bounds"); // checks for out of bounds
+    if (position < 0 || position > this->length) throw string("insert: error, position out of bounds"); // checks for out of bounds
 
     Node* curr = head;
     Node* newNode = new Node(elem);
@@ -135,7 +146,7 @@ void LinkedList<T>::insert(int position, const T& elem) {
         newNode -> next = head;
         newNode -> prev = nullptr;
         head -> prev = newNode;
-        newNode = head;
+        head = newNode;
         ++this->length;
         return;
     }
@@ -143,11 +154,11 @@ void LinkedList<T>::insert(int position, const T& elem) {
     if (position == this->length){
         
         //traverses to last node
-        while (curr != nullptr){
+        while (curr -> next != nullptr){
             curr = curr -> next;
         }
         //inserts or appends last node
-        curr -> next = curr;
+        curr -> next = newNode;
         newNode -> prev = curr;
         newNode -> next = nullptr;
         ++this->length;
@@ -183,12 +194,11 @@ void LinkedList<T>::remove(int position) {
     if (position < 0 || position >= this -> length) throw string("remove: error, position out of bounds"); // checks for out of bounds
 
     Node* curr = head;
-    Node* temp;
     int count = 0;
 
     
 
-    while (curr != nullptr && count < position){ //traverses to node that needs deleting
+    while (curr != nullptr && count < position){ //traverses to node that needs removing
         
         curr = curr -> next;
         ++count;
