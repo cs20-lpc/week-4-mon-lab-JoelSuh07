@@ -36,8 +36,15 @@ int main() {
     cout << myList;
 
     // get the second element and display it
+    //JOEL ADDED TRY CATCH
+    try{
     string word = myList.getElement(2);
+    
     cout << "Element 2: " << word << endl;
+    }
+    catch (string& e){
+        cerr << e << endl;
+    }
 
     // create a second list using the copy constructor
     LinkedList<string> secondList = myList;

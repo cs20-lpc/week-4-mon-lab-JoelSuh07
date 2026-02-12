@@ -117,7 +117,7 @@ int LinkedList<T>::getLength() const {
 template <typename T>
 void LinkedList<T>::insert(int position, const T& elem) {
     // TODO
-    if (position < 0 || position >= this -> length) throw string("remove: error, position out of bounds"); // checks for out of bounds
+    if (position < 0 || position >= this -> length) throw string("insert: error, position out of bounds"); // checks for out of bounds
 
     Node* curr = head;
     Node* newNode = new Node(elem);
