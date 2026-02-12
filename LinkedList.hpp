@@ -12,9 +12,10 @@ class LinkedList : public List<T> {
         struct Node {
             T value;
             Node* next;
+            Node* prev;
 
-            Node(T v = T(), Node* n = nullptr)
-            : value(v), next(n) { }
+            Node(T v = T(), Node* n = nullptr, Node* p = nullptr)
+            : value(v), next(n) ,prev{p} { }
         };
 
         // a pointer to the front of the list

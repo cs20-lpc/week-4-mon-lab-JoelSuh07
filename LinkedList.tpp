@@ -57,6 +57,41 @@ void LinkedList<T>::clear() {
 template <typename T>
 void LinkedList<T>::copy(const LinkedList<T>& copyObj) {
     // TODO
+
+    if (copyObj.head == nullptr){ //checks if other list is empty or not 
+        throw string("copy: error, other list is empty");
+    }
+
+    //copy first node and put it into newHead
+    Node* newHead = new Node(copyObj.head->value);
+    newHead -> next = nullptr;
+    newHead -> prev = nullptr;
+    ++this->length;
+
+    //create a curr pointer to traverse the other list(starting from 2nd node)
+    Node* otherCurr = copyObj.head -> next;
+
+    //create a curr pointer to traverse new list
+    Node* newCurr = newHead;
+
+    //copy rest of list
+    while (otherCurr != nullptr){
+
+        //creates a dynamic newNode to store pointer and value of copied data from old list
+        Node* newNode = new Node(otherCurr-> value);
+
+        //links newNode to curr list
+        newNode -> next = nullptr;
+        newNode -> prev = newCurr;
+        newCurr -> next = newNode;
+
+        //move both pointer forward(otherCurr is one node ahead of newCurr)
+        otherCurr = otherCurr -> next;
+        newCurr = newCurr -> next; // or alternatively, newCurr = newNode
+
+        ++this->length;
+    }
+
 }
 
 template <typename T>
@@ -82,6 +117,57 @@ int LinkedList<T>::getLength() const {
 template <typename T>
 void LinkedList<T>::insert(int position, const T& elem) {
     // TODO
+    if (position < 0 || position >= this -> length) throw string("remove: error, position out of bounds"); // checks for out of bounds
+
+    Node* curr = head;
+    Node* newNode = new Node(elem);
+    int count = 0;
+
+    if (head == nullptr){ //if list is EMPTY, will just act like append
+        head = newNode;
+        head -> next = nullptr;
+        head -> prev = nullptr;
+        ++this->length;
+        return;
+    }
+
+    if (count == position){ //insert at position 0
+        newNode -> next = head;
+        newNode -> prev = nullptr;
+        head -> prev = newNode;
+        newNode = head;
+        ++this->length;
+        return;
+    }
+
+    if (position == this->length){
+        
+        //traverses to last node
+        while (curr != nullptr){
+            curr = curr -> next;
+        }
+        //inserts or appends last node
+        curr -> next = curr;
+        newNode -> prev = curr;
+        newNode -> next = nullptr;
+        ++this->length;
+        return;
+    }
+
+    while (curr != nullptr && count < position){ //traverses to node that needs deleting
+        curr = curr -> next;
+        ++count;
+    }
+
+    //inserts before the curr
+    newNode -> prev = curr -> prev;
+    newNode -> next = curr;
+    curr -> prev -> next = newNode;
+    curr -> prev = newNode;
+
+    ++this->length;
+    
+
 }
 
 template <typename T>
@@ -102,41 +188,44 @@ void LinkedList<T>::remove(int position) {
 
     
 
-    while (curr != nullptr){
-        
-        
-
-        if (count == position){
-            
-            if (curr -> prev == nullptr){ // first node
-
-               temp = head; 
-               head = head -> next;
-               delete temp;
-               --this->length;
-               return;
-
-            } else if (curr -> next == nullptr){ // last node
-
-                delete curr;
-                --this->length;
-                return;
-
-            } else if (!(curr -> prev == nullptr && curr -> next == nullptr)){ //removes middle node
-
-            temp = curr;
-            curr -> prev -> next = curr -> next;
-            curr = curr -> next;
-            --this->length;
-            delete temp;
-            return;
-
-        }
+    while (curr != nullptr && count < position){ //traverses to node that needs deleting
         
         curr = curr -> next;
         ++count;
+
     }
-}
+        //curr would be at the correct node to delete
+        if (count == position){
+            
+            if (curr -> prev == nullptr){ // first node
+            
+               head = curr -> next;
+                
+               if (head != nullptr){
+                    head -> prev = nullptr;
+                }
+
+               delete curr;
+               --this->length;
+
+            } else if (curr -> next == nullptr){ // last node
+
+                curr -> prev -> next = nullptr;
+                delete curr;
+                --this->length;
+
+            } else { //removes middle node
+
+            curr -> prev -> next = curr -> next;
+            curr -> next -> prev = curr -> prev;
+            delete curr;
+            --this->length;
+
+        }
+        
+        
+    }
+
 }
 
 template <typename T>
